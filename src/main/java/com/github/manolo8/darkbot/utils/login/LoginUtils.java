@@ -7,8 +7,7 @@ import com.github.manolo8.darkbot.utils.CaptchaAPI;
 import com.github.manolo8.darkbot.utils.I18n;
 import com.github.manolo8.darkbot.utils.IOUtils;
 import com.github.manolo8.darkbot.utils.StartupParams;
-import eu.darkbot.util.http.Http;
-import eu.darkbot.util.http.Method;
+import com.github.manolo8.darkbot.utils.login.LoginUtils.WrongCredentialsException;
 
 import javax.swing.*;
 import java.io.BufferedReader;
@@ -184,8 +183,8 @@ public class LoginUtils {
     }
 
     public static void findPreloader(LoginData loginData) throws IOException {
-        Http req = Http.create("https://" + loginData.getUrl() + "/indexInternal.es?action=internalMapRevolution", false)
-                .setRawHeader("Cookie", "dosid=" + loginData.getSid());
+        Http req = Http.create("https://pvp-elysium.space/map", false)
+                .setRawHeader("Cookie", "cf_clearance=L.SDt_dPlsCYk.johy0vr7bB8_fOF.vdCft1JOnAKGg-1694509739-0-1-1b5580d9.bfcc1719.4c54df39-0.2.1694509739");
 
         String flashEmbed = req.consumeInputStream(inputStream ->
                 new BufferedReader(new InputStreamReader(inputStream))
