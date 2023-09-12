@@ -1,6 +1,6 @@
 package com.github.manolo8.darkbot.core;
 
-import com.github.manolo8.darkbot.core.api.GameAPI;
+import com.github.manolo8.darkbot.core.api.Capability;
 import com.github.manolo8.darkbot.core.itf.Manager;
 import com.github.manolo8.darkbot.core.utils.Lazy;
 import eu.darkbot.api.API;
@@ -71,8 +71,8 @@ public class BotInstaller implements API.Singleton {
             int speed = API.readMemoryInt(closure + 56);
             int bool = API.readMemoryInt(closure + 60);
             int val = API.readMemoryInt(closure + 64);
-            int cargo = API.readMemoryInt(API.readMemoryLong(closure + 304) + 40);
-            int maxCargo = API.readMemoryInt(API.readMemoryLong(closure + 312) + 40);
+            int cargo = API.readMemoryInt(API.readMemoryLong(closure + 0x138) + 40);
+            int maxCargo = API.readMemoryInt(API.readMemoryLong(closure + 0x140) + 40);
 
             return heroId == API.readMemoryInt(closure + 0x30)
                    && level >= 0 && level <= 100
@@ -130,9 +130,9 @@ public class BotInstaller implements API.Singleton {
     private long lastInternetRead;
     private void checkInvalid() {
         // Background only api ignores invalid checks
-        if (API.hasCapability(GameAPI.Capability.BACKGROUND_ONLY)) return;
+        if (API.hasCapability(Capability.BACKGROUND_ONLY)) return;
 
-        if (API.hasCapability(GameAPI.Capability.HANDLER_INTERNET_READ_TIME)) {
+        if (API.hasCapability(Capability.HANDLER_INTERNET_READ_TIME)) {
             long lastRead = API.lastInternetReadTime();
             if (lastInternetRead != lastRead) {
                 lastInternetRead = lastRead;
@@ -143,7 +143,7 @@ public class BotInstaller implements API.Singleton {
 
         // timer is disarmed on refresh and on valid tick
         if (invalidTimer.tryDisarm()) {
-            if (API.hasCapability(GameAPI.Capability.HANDLER_CLEAR_CACHE))
+            if (API.hasCapability(Capability.HANDLER_CLEAR_CACHE))
                 API.clearCache(".*");
 
             API.handleRefresh();

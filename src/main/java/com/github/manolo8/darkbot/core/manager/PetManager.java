@@ -4,7 +4,7 @@ import com.github.manolo8.darkbot.Main;
 import com.github.manolo8.darkbot.config.NpcExtra;
 import com.github.manolo8.darkbot.config.NpcInfo;
 import com.github.manolo8.darkbot.config.types.suppliers.PetGearSupplier;
-import com.github.manolo8.darkbot.core.api.GameAPI;
+import com.github.manolo8.darkbot.core.api.Capability;
 import com.github.manolo8.darkbot.core.entities.FakeNpc;
 import com.github.manolo8.darkbot.core.entities.Npc;
 import com.github.manolo8.darkbot.core.entities.Pet;
@@ -177,7 +177,7 @@ public class PetManager extends Gui implements PetAPI {
         private final Gear gear;
         public NpcPick(String npcName, NpcInfo npc) {
             this.npc = npc;
-            String fuzzyName = Strings.fuzzyMatcher(npcName);
+            String fuzzyName = npc.fuzzyName != null ? npc.fuzzyName : (npc.fuzzyName = Strings.fuzzyMatcher(npcName));
             this.gear = locatorList.stream().filter(l -> fuzzyName.equals(l.fuzzyName)).findFirst().orElse(null);
         }
     }
@@ -726,7 +726,7 @@ public class PetManager extends Gui implements PetAPI {
         }
 
         public void setModule(long gearsSprite) {
-            if (!API.hasCapability(GameAPI.Capability.DIRECT_CALL_METHOD)) return;
+            if (!API.hasCapability(Capability.DIRECT_CALL_METHOD)) return;
 
             Main.API.callMethodChecked(true, "23(handleClick)(2626)1016321600", 148, address);
             // hide gears list again

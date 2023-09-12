@@ -3,13 +3,14 @@ package com.github.manolo8.darkbot.core.manager;
 import com.github.manolo8.darkbot.Main;
 import com.github.manolo8.darkbot.core.BotInstaller;
 import com.github.manolo8.darkbot.core.itf.Manager;
+import com.github.manolo8.darkbot.core.itf.NativeUpdatable;
 import com.github.manolo8.darkbot.core.itf.Tickable;
 import eu.darkbot.api.API;
 
 import static com.github.manolo8.darkbot.Main.API;
 
 
-public class SettingsManager implements Manager, Tickable, API.Singleton {
+public class SettingsManager implements Manager, Tickable, API.Singleton, NativeUpdatable {
 
     private final Main main;
     public int config;
@@ -39,36 +40,42 @@ public class SettingsManager implements Manager, Tickable, API.Singleton {
 
     @Override
     public void tick() {
-        this.config = API.readMemoryInt(address + 92);
+        this.config = readInt(0x5c);
 
         // x-1 & x-2 maps enemy counter
-        this.enemyCount = API.readInt(address, 600, 40);
-        this.attackViaSlotbar = API.readBoolean(address, 164);
+        this.enemyCount = readInt(0x258, 40);
+        this.attackViaSlotbar = readBoolean(0xa4);
 
-        this.nextMap = API.readMemoryInt(address + 244);
-        this.currMap = API.readMemoryInt(address + 248);
+        this.nextMap = readInt(0xf4);
+        this.currMap = readInt(0xf8);
 
-        this.force2d = API.readMemoryInt(address, 792, 0x20);
+        this.force2d = readInt(0x318, 32);
 
-        this.lang = API.readMemoryStringFallback(address, null, 648);
+        this.lang = readString(0x288);
 
-        this.uiWrapper = Main.API.readLong(address, 872);
-        this.hudWrapper = Main.API.readLong(address, 864);
+        this.hudWrapper = readLong(0x360);
+        this.uiWrapper = readLong(0x368);
 
         // Enforce GPU capabilities support - it still may be an issue on Windows & 2D mode
         if (is2DForced() && main.config.BOT_SETTINGS.API_CONFIG.ENFORCE_HW_ACCEL) {
-            API.replaceInt(address + 332, 0, 1);
-            API.replaceInt(address + 340, 0, 1);
+            replaceInt(0, 1, 0x14c);
+            replaceInt(0, 1, 0x154);
         }
 
         if (!driverNamePrinted) {
-            this.driver = API.readString(address, "", 440);
+            this.driver = readString(0x1b8);
 
             if (driver != null && !driver.isEmpty()) {
                 System.out.println("Game is using: " + driver + " | force2d: " + force2d);
                 driverNamePrinted = true;
             }
         }
+    }
+
+    @Override
+    public int modifyOffset(int offset) {
+        if (offset >= 0x188) offset += 8; // 19.07.2023 - jumpGateResourceHash
+        return offset;
     }
 
     public boolean is2DForced() {
@@ -93,5 +100,10 @@ public class SettingsManager implements Manager, Tickable, API.Singleton {
         if (hudWrapper != 0) {
             API.callMethodAsync(4, hudWrapper, visible ? 1 : 0);
         }
+    }
+
+    @Override
+    public long getAddress() {
+        return address;
     }
 }
